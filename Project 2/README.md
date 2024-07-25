@@ -1,4 +1,6 @@
 # Case Study #2 Pizza Runner🍕  
+![image](https://github.com/user-attachments/assets/df2c8094-0668-4349-8225-3ae3a6d377f2)
+
 ## Contents
 
 1. Introduction
@@ -16,7 +18,15 @@
 
 ## Entity Relationship Diagram
 
+![image](https://github.com/user-attachments/assets/05458e9d-e893-449c-81fe-d2d40c3e5ef6)
+
+
 ## Data Cleaning & Data Transformation
+
+#### Customer data table before
+
+![image](https://github.com/user-attachments/assets/b1df35e6-49c9-4cd7-95a8-94398323ab2d)
+
 
 + The customer_orders table consists of individual pizza orders, with each row representing a unique pizza.
 + Key columns in the table are pizza_id, exclusions, and extras.
@@ -42,7 +52,12 @@
 
 + customer_orders table After AS customer_order_tempp
 
+![image](https://github.com/user-attachments/assets/0b7ace1c-b74b-4267-a2ed-d33d7627d1b4)
+
+
 + runner_orders table Before
+
+![image](https://github.com/user-attachments/assets/15d2bb70-cb78-4303-9180-fa238f6d3809)
 
 
 The data in the orders table of Pizza Runner contains valuable information regarding the assignment of orders to runners, including pickup times, distances, and durations. However, it is crucial to note that the table may have some known data issues that require careful handling during data cleaning.
@@ -80,6 +95,9 @@ Here are the key points to consider when cleaning the data in the orders table:
 
 + runner_orders table After AS runner_orders_temp
 
+  ![image](https://github.com/user-attachments/assets/360dfc6a-e0b4-4ae9-a0b8-ed6e33daf323)
+
+
 
 ## Case Study Questions & Solutions
 
@@ -90,6 +108,9 @@ A. Pizza Metrics🍕🍕
     SELECT COUNT(order_id)AS total_pizzas
     FROM customer_orders_temp;
 
+![image](https://github.com/user-attachments/assets/f474021c-8faf-4ed7-a565-f6f8f9972dd7)
+
+
 + The SQL query selects the number of pizza orders (`pizza_orders`) from the `customer_orders_temp table.
 + The `COUNT(order_id)` function calculates the total number of order IDs in the `customer_orders_temp` table, effectively giving the count of pizza orders.
 + As a result, the query presents the total count of pizza orders as `pizza_orders`.
@@ -98,6 +119,9 @@ A. Pizza Metrics🍕🍕
 
 	SELECT COUNT(DISTINCT order_id) AS unique_orders
     FROM customer_orders_temp;
+
+![image](https://github.com/user-attachments/assets/54e65ca7-d595-469d-85d2-79a34b1a12fc)
+
 
 + The SQL query selects the number of unique orders (`unique_orders`) from the `customer_orders_tem` table.
 + The `COUNT(DISTINCT order_id)` function calculates the total count of distinct order IDs in the `customer_orders_temp` table, effectively giving the count of unique orders.
@@ -111,6 +135,8 @@ A. Pizza Metrics🍕🍕
     FROM runner_orders_temp 
     WHERE cancellation IS NULL
     GROUP BY 1;
+
+![image](https://github.com/user-attachments/assets/aa7c625a-ff6d-43bb-b285-b9ca80c7e9c4)
 
 + The SQL query selects the `runner_id` and counts the number of orders delivered (ordeR_count) for each runner from the `runner_orders_temp` table.
 + It retrieves data from the `runner_orders_temp` table.
@@ -133,6 +159,8 @@ A. Pizza Metrics🍕🍕
     WHERE r.cancellation IS NULL
     GROUP BY 1;
 
+![image](https://github.com/user-attachments/assets/6a10c206-b73c-49ba-8631-567609e88786)
+
 + The SQL query retrieves the `pizza_name` and counts the number of delivered orders for each pizza (`pizza_count`) from the `customer_orders_temp` table.
 + It retrieves data from the `customer_orders_temp` table and joins it with the `runner_orders_temp` table and the `pizza_names` table.
 + The query performs joins between the tables based on matching `order_id`, `pizza_id`, and `pizza_name`.
@@ -153,6 +181,8 @@ A. Pizza Metrics🍕🍕
     ON p.pizza_id = c.pizza_id
     GROUP BY 1;
 
+![image](https://github.com/user-attachments/assets/b629a614-5a4f-4e3f-b005-9c406e94fdd1)
+
 + The SQL query retrieves the `customer_id`, `pizza_name`, and counts the number of ordered pizzas for each customer and pizza combination from the `customer_orders_temp` table.
 + It retrieves data from the `customer_orders_temp` table and joins it with the `pizza_names` table based on matching `pizza_id`.
 + Results are grouped by both `customer_id` and `pizza_name` to calculate the count of ordered pizzas for each customer and pizza combination.
@@ -170,6 +200,9 @@ A. Pizza Metrics🍕🍕
     GROUP BY order_time
     ORDER BY pizza_count DESC
     LIMIT 1;
+
+
+![image](https://github.com/user-attachments/assets/44781a52-22fc-4ff9-b4f9-d544da6e94b3)
 
 + It retrieves the `order_id` and calculates the number of pizzas delivered for each order (`orders_delivered`) from the `customer_orders_temp` table.
 + It performs an left join between the `customer_orders_tempp` table and the `runner_orders_temp` table on matching `order_id` to get the pizza delivery information.
@@ -191,6 +224,8 @@ A. Pizza Metrics🍕🍕
     WHERE cancellation IS NULL
     GROUP BY 1;
 
+
+![image](https://github.com/user-attachments/assets/94557234-a034-4876-92fa-446cb381aadd)
 
 + It retrieves the `customer_id` and calculates two aggregates:
 `changes` - the count of customers who have at least one change in their orders.
@@ -216,6 +251,8 @@ no_changes - the count of customers who have no changes in their orders (neither
 	  AND exclusions IS NOT NULL 
 	  AND extras IS NOT NULL;
 
+![image](https://github.com/user-attachments/assets/fb15a399-26d5-4a2f-b04f-7fd341a14c24)
+
 + The SQL query calculates the count of pizzas with both `exclusions` and `extras` from the `customer_orders_temp` table.
 + It performs an left join between the `customer_orders_temp` table and the `runner_orders_temp` table on matching `order_id` to get the order information.
 + The query filters the data using the `WHERE` clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
@@ -232,6 +269,9 @@ no_changes - the count of customers who have no changes in their orders (neither
     GROUP BY 1
     ORDER BY hr ASC;
 
+
+![image](https://github.com/user-attachments/assets/b290c886-8731-48fc-bba2-366a645f7560)
+
 + The SQL query selects the hours portion of the `order_time` and the count of orders (pizza_count) from the `customer_orders_temp` table.
 + It uses the `HOUR` function with HOURS to extract the hour portion from the `order_time`.
 + Results are grouped by the extracted hour value to calculate the count of orders for each hour.
@@ -247,6 +287,8 @@ no_changes - the count of customers who have no changes in their orders (neither
         COUNT(pizza_id) AS pizza_count
     FROM customer_orders_temp
     GROUP BY 1;
+
+![image](https://github.com/user-attachments/assets/3f73b468-bca2-4bb9-a55a-6a51bae33591)
 
 + The SQL query selects the day of the week from the `order_time` and the count of orders (`pizza_count`) from the `customer_orders_tempp` table.
 + It uses the `DAY_NAME`function to convert the `order_time` into a textual representation of the day of the week (DAY).
@@ -266,6 +308,8 @@ B. Runner And Customer Experience 💁‍♂️🍕
     FROM runners
     GROUP BY weeks
     ORDER BY weeks;
+
+![image](https://github.com/user-attachments/assets/1919ec13-cd2a-4897-afc2-6620246837bc)
 
 + The SQL query retrieves the week number of the year from the `registration_date` column in the runners table and the count of signed-up runners for each week (`signed_runner_week`).
 + It uses the `WEEK` function to convert the `registration_date` to a text representation of the week number of the year ('ww').
@@ -289,9 +333,12 @@ B. Runner And Customer Experience 💁‍♂️🍕
                1,2, c.order_time, r.pickup_time)
     SELECT 
 	    runner_id,
-        AVG(time_diff) AS time_diff
+        ROUND(AVG(time_diff),0) AS time_diff
     FROM CTE
     GROUP BY 1;
+
+
+![image](https://github.com/user-attachments/assets/a528deef-9875-4ee6-8ff9-1a84d35126d0)
 
 + The SQL query starts by creating a Common Table Expression (CTE) named CTE.
 + Within the CTE, it retrieves the `order_id`, `order_time`, `pickup_time`, and calculates the time difference in minutes `time_diff` between the `pickup_time` and `order_time` for each order from the `runner_orders_temp` and `customer_orders_temp` tables.
@@ -318,6 +365,8 @@ B. Runner And Customer Experience 💁‍♂️🍕
     FROM CTE
     GROUP BY 1;
 
+![image](https://github.com/user-attachments/assets/62c3f701-1174-4db3-8fff-54e9c399d4a6)
+
 + The SQL query starts by creating a Common Table Expression (CTE) named CTE.
 + Within the CTE, it calculates the count of pizzas ordered for each order, calculates the time difference in minutes (min) between the `pickup_time` and `order_time` for each order from the `customer_orders_temp` and `runner_orders_temp` tables.
 + It performs an left join between the `customer_orders_temp` table and the `runner_orders_temp` table on matching `order_id` to get the order and pickup time information.
@@ -331,8 +380,6 @@ B. Runner And Customer Experience 💁‍♂️🍕
 
 #### 4. What was the average distance travelled for each customer?
 
-
-
        SELECT 
 		customer_id,
         ROUND(AVG(distance),2) AS dist_km
@@ -340,6 +387,8 @@ B. Runner And Customer Experience 💁‍♂️🍕
       LEFT JOIN runner_orders_temp r
       ON c.order_id = r.order_id
       GROUP BY 1;
+
+![image](https://github.com/user-attachments/assets/afb9362e-dadc-4d00-a4ab-2e01a6dfba4b)
 
 +  The SQL query retrieves the `customer_id` and calculates the rounded average distance traveled for each customer from the `customer_orders_tempp` and `runner_orders_temp` tables.
 + It performs an left join between the `customer_orders_tempp` table and the `runner_orders_temp` table on matching `order_id` to get the order and delivery information.
@@ -355,6 +404,7 @@ B. Runner And Customer Experience 💁‍♂️🍕
             MAX(duration) - MIN(duration) as time_diff
       FROM runner_orders_temp;
 
+![image](https://github.com/user-attachments/assets/24b011a7-8742-4d4a-a38c-199dfbc7da0f)
 
 + The SQL query calculates the longest delivery duration (`long_delivery`), shortest delivery duration (`shortest_delivery`), and the difference between the longest and shortest durations from the `runner_orders_temp` table.
 + The `MAX(duration)` function calculates the maximum value of the duration column from the `runner_orders_temp` table, representing the longest delivery duration.
@@ -365,7 +415,6 @@ B. Runner And Customer Experience 💁‍♂️🍕
 #### 6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
 
 
-
     SELECT 
 		runner_id,
             order_id,
@@ -373,6 +422,8 @@ B. Runner And Customer Experience 💁‍♂️🍕
     FROM runner_orders_temp
     WHERE cancellation IS NULL
     ORDER BY 1 ASC;
+
+![image](https://github.com/user-attachments/assets/d8cc48fd-4f85-49d6-8c1a-268b0241c4f5)
 
 + It retrieves `runner_id`, `order_id` and `avg_speed`.
 + The query filters the data using the WHERE clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
@@ -388,6 +439,9 @@ B. Runner And Customer Experience 💁‍♂️🍕
             ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2) AS delivery_pct
     FROM runner_orders_temp
     GROUP BY 1;
+
+![image](https://github.com/user-attachments/assets/32c18200-3247-4de2-bfa6-c352c11c883f)
+
 
 + It retrieves the `runner_id` and `ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2)` to find the percentage of successful deliveries
 
@@ -412,18 +466,18 @@ C. Ingredient Optimization 🍕
     SELECT WEEK(registration_date,1) AS weeks,
     WITH final_table AS (
 		SELECT 
-				pizza_id,
-				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(toppings, ',', num), ',', -1)) AS topping_id,
-				topping_name
+			pizza_id,
+			TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(toppings, ',', num), ',', -1)) AS topping_id,
+			topping_name
 		FROM
-				(SELECT 
-						pizza_id,
-						toppings,
-						LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1 AS toppings_nums,
-						numbers.num
-				FROM pizza_recipes
-				JOIN numbers
-				ON numbers.num <= LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1) a
+			(SELECT 
+				pizza_id,
+				toppings,
+				LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1 AS toppings_nums,
+				numbers.num
+			FROM pizza_recipes
+			JOIN numbers
+			ON numbers.num <= LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1) a
 		LEFT JOIN pizza_toppings
 		ON TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(toppings, ',', num), ',', -1)) = pizza_toppings.topping_id)
     SELECT
@@ -433,23 +487,25 @@ C. Ingredient Optimization 🍕
     FROM final_table
     GROUP BY 1;
 
+![image](https://github.com/user-attachments/assets/cd4032c2-d2cf-49a9-ad0a-b68effe1f957)
+
 
 #### 2. What was the most commonly added extra?
 
 
 	WITH final_table AS (
 		SELECT 
-				extras,
-				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(extras, ',', num),',', -1)) as extras_id
+			extras,
+			TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(extras, ',', num),',', -1)) as extras_id
 		FROM
-				(SELECT 
-						extras,
-						LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1 AS no_of_extras,
-						num
-				FROM customer_orders_temp
-				JOIN numbers
-				ON  numbers.num <= LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1
-				WHERE extras IS NOT NULL) a)
+			(SELECT 
+				extras,
+				LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1 AS no_of_extras,
+				num
+			FROM customer_orders_temp
+			JOIN numbers
+			ON  numbers.num <= LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1
+			WHERE extras IS NOT NULL) a)
      SELECT 
         topping_name,
         COUNT(extras_id) AS extra_counts
@@ -461,23 +517,25 @@ C. Ingredient Optimization 🍕
     LIMIT 1;
 
 
+![image](https://github.com/user-attachments/assets/1c1c30f7-fafc-4f3c-a6b0-b467b1da26ee)
+
 #### 3. What was the most common exclusion?
 
 
 
      WITH final_table AS (
 		SELECT 
-				exclusions,
-				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(exclusions, ',', num), ',' , -1)) as exclusion_id
+			exclusions,
+			TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(exclusions, ',', num), ',' , -1)) as exclusion_id
 		FROM (
-				SELECT 
-						exclusions,
-						LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 as no_of_exclusions,
-						num
-				FROM customer_orders_temp
-				JOIN numbers
-				ON LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 >= numbers.num
-				WHERE exclusions IS NOT NULL) A)
+			SELECT 
+				exclusions,
+				LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 as no_of_exclusions,
+				num
+			FROM customer_orders_temp
+			JOIN numbers
+			ON LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 >= numbers.num
+			WHERE exclusions IS NOT NULL) A)
     SELECT 
         topping_name,
         COUNT(exclusion_id) as exclusion_count
@@ -488,6 +546,7 @@ C. Ingredient Optimization 🍕
     ORDER BY 2 DESC
     LIMIT 1;
 
+![image](https://github.com/user-attachments/assets/3ebf4da5-7592-47e0-a696-b45b8ab311b5)
 
 
 #### 4. Generate an order item for each record in the customers_orders table in the format of one of the following:
@@ -497,9 +556,9 @@ C. Ingredient Optimization 🍕
 + Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
 
 
-
+       SET @ row_number := 0:
        WITH orders AS (
-      SELECT
+       SELECT
        @row_number := @row_number +1 as id,
 		p.pizza_name,
 		(SELECT GROUP_CONCAT(pt.topping_name SEPARATOR ', ')
@@ -529,3 +588,28 @@ C. Ingredient Optimization 🍕
             END
         ) AS order_items
       FROM orders;
+
+![image](https://github.com/user-attachments/assets/5a2c3b54-62db-4039-bf99-7f0b99fe8c3d)
+
+
+### Key Insights
+
++ Analyzing pizza orders and customer preferences can guide menu optimization.
++ Identifying top-performing runners ensures efficient delivery and customer satisfaction.
++ Understanding customer order patterns aids in targeted promotions and staffing.
++ Ingredient optimization reduces food waste and enhances inventory management.
++ Data cleaning ensures accurate analysis and informed decision-making.
+Improving the customer experience fosters loyalty and business growth.
++ Data-driven decisions lead to better resource allocation and growth opportunities.
++ Runner Sign-Ups: Analyzing the number of runners signing up each week helps identify trends and patterns in runner recruitment and engagement.
++ Delivery Time Analysis: Calculating the average time it takes for runners to arrive at Pizza Runner HQ for order pickups can reveal efficiency levels and potential areas for improvement in the delivery process.
++ Order Preparation and Pizza Count: Exploring any relationship between the number of pizzas ordered and the time it takes to prepare them can assist in optimizing kitchen operations and delivery timelines.
+Customer Average Distance: Understanding the average distance traveled for each customer's orders can help identify delivery patterns and optimize delivery routes.
++ Longest and Shortest Delivery Times: Analyzing the difference between the longest and shortest delivery durations can reveal variations in delivery efficiency and potential outliers.
++ Runner Average Speed: Calculating the average speed of each runner for each delivery provides insights into their performance and helps identify high-performing runners.
++ Successful Delivery Percentage: Determining the successful delivery percentage for each runner allows assessing their reliability and performance in completing orders.
++ Standard Ingredients for Each Pizza: Understanding the standard ingredients for each pizza helps identify the base recipe and essential toppings used for various pizza types.
++ Most Commonly Added Extra: Analyzing the most commonly added extra topping provides insights into customer preferences and popular customization choices.
++ Most Common Exclusion: Identifying the most common exclusion topping helps understand popular preferences for omitting specific ingredients.
+Generating Order Items: Creating formatted order items for each record in the customer_orders table allows presenting detailed information about each order, including the pizza name, excluded toppings, and extra toppings.
+
