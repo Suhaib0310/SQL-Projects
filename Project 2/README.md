@@ -254,3 +254,139 @@ no_changes - the count of customers who have no changes in their orders (neither
 + The `COUNT(pizza_id) `function calculates the number of occurrences of each `order_id` in the `customer_orders_temp` table, giving the count of orders for each day of the week.
 + The query presents the textual representation of the day of the week as day and the corresponding count of orders as `ordered_pizza`.
 + Finally, the results are sorted based on the textual representation of the day of the week.
+
+
+B. Runner And Customer Experience 💁‍♂️🍕
+
+#### 1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
+
+
+    ]SELECT WEEK(registration_date,1) AS weeks,
+       COUNT(runner_id) AS signed_runner_week
+    FROM runners
+    GROUP BY weeks
+    ORDER BY weeks;
+
++ The SQL query retrieves the week number of the year from the `registration_date` column in the runners table and the count of signed-up runners for each week (`signed_runner_week`).
++ It uses the `WEEK` function to convert the `registration_date` to a text representation of the week number of the year ('ww').
++ Results are grouped by the `week number` of the year to calculate the count of `signed-up runners` for each week.
++ The `COUNT(runner_id)` function calculates the number of occurrences of each `runner_id` in the runners table, giving the count of signed-up runners for each week.
++ As a result, the query presents the week number of the year as weeks and the corresponding count of signed-up runners as `signed_runner_week`..
+
+#### 2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pick up the order?
+
+
+	WITH CTE AS (
+          SELECT 
+               c.order_id,
+               r.runner_id,
+               timestampdiff(MINUTE , order_time, pickup_time) AS time_diff
+          FROM  
+	           customer_orders_temp c
+         LEFT JOIN 
+               runner_orders_temp r ON r.order_id = c.order_id
+         GROUP BY 
+               1,2, c.order_time, r.pickup_time)
+    SELECT 
+	    runner_id,
+        AVG(time_diff) AS time_diff
+    FROM CTE
+    GROUP BY 1;
+
++ The SQL query starts by creating a Common Table Expression (CTE) named CTE.
++ Within the CTE, it retrieves the `order_id`, `order_time`, `pickup_time`, and calculates the time difference in minutes `time_diff` between the `pickup_time` and `order_time` for each order from the `runner_orders_temp` and `customer_orders_temp` tables.
++ It performs an left join between the `runner_orders_temp` table and the `customer_orders_temp` table on matching `order_id` to get the order and pickup time information.
++ Results are grouped by `order_id`, `order_time`, and `pickup_time` to calculate the time difference for each order.
++ The `TIMESTAMPDIFF(minutes, order_time. pickup_time)` expression calculates the time difference in minutes between the `pickup_time` and `order_time` for each order.
++ Next, the main query retrieves the value of the average of all values from the CTE CTE..
++ As a result, the query presents the integer value of the average pickup time for all orders with pickup times after the order times from the `runner_orders_temp` and `customer_orders_temp` tables, excluding any orders with cancellations.
+
+#### 3. Is there any relationship between the number of pizzas and how long the order takes to prepare?
+
+
+     WITH CTE AS (
+		SELECT 
+			count(c.pizza_id) AS pizza_count,
+			TIMESTAMPDIFF(MINUTE, c.order_time, r.pickup_time) AS time_diff
+		FROM customer_orders_temp c 
+		LEFT JOIN runner_orders_temp r
+		ON r.order_id = c.order_id
+		GROUP BY  order_time, pickup_time)
+    SELECT 
+	pizza_count,
+    ROUND(AVG(time_diff),0) AS time_diff
+    FROM CTE
+    GROUP BY 1;
+
++ The SQL query starts by creating a Common Table Expression (CTE) named CTE.
++ Within the CTE, it calculates the count of pizzas ordered for each order, calculates the time difference in minutes (min) between the `pickup_time` and `order_time` for each order from the `customer_orders_temp` and `runner_orders_temp` tables.
++ It performs an left join between the `customer_orders_temp` table and the `runner_orders_temp` table on matching `order_id` to get the order and pickup time information.
++ Results are grouped by `order_time`, and `pickup_time` to calculate the count of pizzas ordered and the time difference (min) for each order.
++ The `COUNT(C.pizza_id) function calculates the number of occurrences of each `order_id` in the `customer_orders_tempp` table, giving the count of pizzas ordered for each order.
++ The `TIMESTAMPDIFF(minutes, order_time, pickup_time)` expression calculates the time difference in minutes between the `pickup_time` and `order_time` for each order.
++ Next, the main query retrieves the count of pizzas ordered (pizza_order) and the rounded average of all min values (average preparation time in minutes) for orders.
++ The `ROUND(AVG(min),2)` expression calculates the average preparation time for pizzas and rounds it to two decimal places.
++ Results are grouped by `pizza_count`, which represents the count of pizzas ordered for each order.
++ As a result, the query presents the count of pizzas ordered (pizza_count) and the rounded average preparation time in minutes for orders from the `customer_orders_tempp` and `runner_orders_temp` tables, excluding any
+
+#### 4. What was the average distance travelled for each customer?
+
+
+
+       SELECT 
+		customer_id,
+        ROUND(AVG(distance),2) AS dist_km
+      FROM customer_orders_temp c
+      LEFT JOIN runner_orders_temp r
+      ON c.order_id = r.order_id
+      GROUP BY 1;
+
++  The SQL query retrieves the `customer_id` and calculates the rounded average distance traveled for each customer from the `customer_orders_tempp` and `runner_orders_temp` tables.
++ It performs an left join between the `customer_orders_tempp` table and the `runner_orders_temp` table on matching `order_id` to get the order and delivery information.
++ Results are grouped by `customer_id` to calculate the average distance traveled for each customer.
++ The `ROUND(AVG(distance),2)` expression calculates the rounded average distance for each customer to two decimal places.
++ As a result, the query presents the `customer_id` and the corresponding rounded average distance traveled as average for each customer from the `customer_orders_tempp` and `runner_orders_temp` tables, excluding any orders with cancellations.
+
+-- 5. What was the difference between the longest and shortest delivery times for all orders?
+
+       SELECT
+		MAX(duration) AS longest_delivery,
+            MIN(duration) AS shortest_delivery,
+            MAX(duration) - MIN(duration) as time_diff
+      FROM runner_orders_temp;
+
+
++ The SQL query calculates the longest delivery duration (`long_delivery`), shortest delivery duration (`shortest_delivery`), and the difference between the longest and shortest durations from the `runner_orders_temp` table.
++ The `MAX(duration)` function calculates the maximum value of the duration column from the `runner_orders_temp` table, representing the longest delivery duration.
++ The `MIN(duration)` function calculates the minimum value of the duration column from the `runner_orders_temp` table, representing the shortest delivery duration.
++ The `MAX(duration) - MIN(duration)` expression calculates the difference between the longest and shortest delivery durations.
++ As a result, the query presents the longest delivery duration as `long_delivery`, the shortest delivery duration as `shortest_delivery`, and the difference between the two durations as difference from the `runner_orders_temp` table.
+
+#### 6. What was the average speed for each runner for each delivery and do you notice any trend for these values?
+
+
+
+    SELECT 
+		runner_id,
+            order_id,
+            ROUND(distance/duration*60,2) AS avg_speed
+    FROM runner_orders_temp
+    WHERE cancellation IS NULL
+    ORDER BY 1 ASC;
+
++ It retrieves `runner_id`, `order_id` and `avg_speed`.
++ The query filters the data using the WHERE clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
++ The ROUND(distance/duration*60,2) expression calculates the delivery duration in hours for each order.
+
+
+
+#### 7. What is the successful delivery percentage for each runner?
+
+
+    SELECT 
+		runner_id,
+            ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2) AS delivery_pct
+    FROM runner_orders_temp
+    GROUP BY 1;
+
++ It retrieves the `runner_id` and `ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2)` to find the percentage of successful deliveries
