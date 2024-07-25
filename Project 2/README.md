@@ -50,7 +50,7 @@
 		order_time
       FROM customer_orders;
 
-+ customer_orders table After AS customer_order_tempp
++ customer_orders table After AS customer_order_temp
 
 ![image](https://github.com/user-attachments/assets/0b7ace1c-b74b-4267-a2ed-d33d7627d1b4)
 
@@ -101,7 +101,7 @@ Here are the key points to consider when cleaning the data in the orders table:
 
 ## Case Study Questions & Solutions
 
-A. Pizza Metrics🍕🍕
+### A. Pizza Metrics🍕🍕
 
 #### 1. How many pizzas were ordered?
 
@@ -298,7 +298,8 @@ no_changes - the count of customers who have no changes in their orders (neither
 + Finally, the results are sorted based on the textual representation of the day of the week.
 
 
-B. Runner And Customer Experience 💁‍♂️🍕
+
+### B. Runner And Customer Experience 💁‍♂️🍕
 
 #### 1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 
@@ -396,7 +397,7 @@ B. Runner And Customer Experience 💁‍♂️🍕
 + The `ROUND(AVG(distance),2)` expression calculates the rounded average distance for each customer to two decimal places.
 + As a result, the query presents the `customer_id` and the corresponding rounded average distance traveled as average for each customer from the `customer_orders_tempp` and `runner_orders_temp` tables, excluding any orders with cancellations.
 
--- 5. What was the difference between the longest and shortest delivery times for all orders?
+#### 5. What was the difference between the longest and shortest delivery times for all orders?
 
        SELECT
 		MAX(duration) AS longest_delivery,
@@ -445,7 +446,8 @@ B. Runner And Customer Experience 💁‍♂️🍕
 
 + It retrieves the `runner_id` and `ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2)` to find the percentage of successful deliveries
 
-C. Ingredient Optimization 🍕
+
+### C. Ingredient Optimization 🍕
 
 
 + Created a table called numbers, it will be used to split columns values into individual rows
