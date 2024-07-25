@@ -300,7 +300,7 @@ The case study revolves around three key datasets:
 + The query then presents the `customer_id` and the calculated points for each customer based on their purchases.
 
 
-### Key Insights
+## Key Insights
 
 + Customer Spending: The total amount spent by each customer at Danny's Diner varies widely. Some customers have spent significantly more than others, indicating potential high-value customers or loyal patrons.
 Customer Visits: The number of days each customer visited the restaurant also varies, showing different patterns of customer engagement. Some customers visit frequently, while others may visit less often.
