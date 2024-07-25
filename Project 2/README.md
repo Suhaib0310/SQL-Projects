@@ -390,3 +390,142 @@ B. Runner And Customer Experience 💁‍♂️🍕
     GROUP BY 1;
 
 + It retrieves the `runner_id` and `ROUND(COUNT(pickup_time)/COUNT(order_id)*100,2)` to find the percentage of successful deliveries
+
+C. Ingredient Optimization 🍕
+
+
++ Created a table called numbers, it will be used to split columns values into individual rows
+
+
+    CREATE TABLE numbers (
+    num INT PRIMARY KEY
+);
+
+    INSERT INTO numbers (num)
+    VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
+       (11), (12), (13), (14), (15), (16), (17), (18), (19), (20);
+
+#### 1. What are the standard ingredients for each pizza?
+
+
+
+    SELECT WEEK(registration_date,1) AS weeks,
+    WITH final_table AS (
+		SELECT 
+				pizza_id,
+				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(toppings, ',', num), ',', -1)) AS topping_id,
+				topping_name
+		FROM
+				(SELECT 
+						pizza_id,
+						toppings,
+						LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1 AS toppings_nums,
+						numbers.num
+				FROM pizza_recipes
+				JOIN numbers
+				ON numbers.num <= LENGTH(toppings) - LENGTH(REPLACE(toppings, ',', '')) +1) a
+		LEFT JOIN pizza_toppings
+		ON TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(toppings, ',', num), ',', -1)) = pizza_toppings.topping_id)
+    SELECT
+		pizza_id,
+        group_concat(topping_name ORDER BY topping_name SEPARATOR ', ') AS 
+    toppings
+    FROM final_table
+    GROUP BY 1;
+
+
+#### 2. What was the most commonly added extra?
+
+
+	WITH final_table AS (
+		SELECT 
+				extras,
+				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(extras, ',', num),',', -1)) as extras_id
+		FROM
+				(SELECT 
+						extras,
+						LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1 AS no_of_extras,
+						num
+				FROM customer_orders_temp
+				JOIN numbers
+				ON  numbers.num <= LENGTH(extras) - LENGTH(REPLACE(extras,',','')) +1
+				WHERE extras IS NOT NULL) a)
+     SELECT 
+        topping_name,
+        COUNT(extras_id) AS extra_counts
+    FROM final_table
+    LEFT JOIN pizza_toppings p
+    ON p.topping_id = final_table.extras_id
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 1;
+
+
+#### 3. What was the most common exclusion?
+
+
+
+     WITH final_table AS (
+		SELECT 
+				exclusions,
+				TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(exclusions, ',', num), ',' , -1)) as exclusion_id
+		FROM (
+				SELECT 
+						exclusions,
+						LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 as no_of_exclusions,
+						num
+				FROM customer_orders_temp
+				JOIN numbers
+				ON LENGTH(exclusions) - LENGTH(REPLACE(exclusions, ',' ,''))+ 1 >= numbers.num
+				WHERE exclusions IS NOT NULL) A)
+    SELECT 
+        topping_name,
+        COUNT(exclusion_id) as exclusion_count
+    FROM final_table
+    LEFT JOIN pizza_toppings p 
+    ON p.topping_id = final_table.exclusion_id
+    GROUP BY 1
+    ORDER BY 2 DESC
+    LIMIT 1;
+
+
+
+#### 4. Generate an order item for each record in the customers_orders table in the format of one of the following:
++ Meat Lovers
++ Meat Lovers - Exclude Beef
++ Meat Lovers - Extra Bacon
++ Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
+
+
+
+       WITH orders AS (
+      SELECT
+       @row_number := @row_number +1 as id,
+		p.pizza_name,
+		(SELECT GROUP_CONCAT(pt.topping_name SEPARATOR ', ')
+		FROM pizza_toppings pt
+		WHERE FIND_IN_SET(pt.topping_id, REPLACE(c.exclusions, ' ', '')) > 0
+        ) AS exclusion,
+        (SELECT GROUP_CONCAT(pt.topping_name SEPARATOR ', ')
+		FROM pizza_toppings pt
+		WHERE FIND_IN_SET(pt.topping_id, REPLACE(c.extras, ' ', '')) > 0
+        ) AS extra,
+        order_time
+      FROM customer_orders_temp c
+			LEFT JOIN pizza_names p
+			ON p.pizza_id = c.pizza_id
+      )
+      SELECT
+           id,
+           CONCAT(
+           pizza_name,
+           CASE
+               WHEN exclusion IS NULL THEN ''
+               ELSE CONCAT(' - Exclude ', exclusion)
+            END,
+           CASE
+               WHEN extra IS NULL THEN ''
+               ELSE CONCAT(' - Extras ', extra)
+            END
+        ) AS order_items
+      FROM orders;
