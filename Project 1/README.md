@@ -34,10 +34,234 @@ The case study revolves around three key datasets:
 #### 1. What is the total amount each customer spent at the restaurant?
 
     SELECT 
-	customer_id, 
+	    customer_id, 
         SUM(M.price)AS total_amount
-        FROM SALES S
-        LEFT JOIN menu M
-        ON M.product_id = S.product_id
-        GROUP BY customer_id;
+    FROM SALES S
+    LEFT JOIN menu M
+    ON M.product_id = S.product_id
+    GROUP BY customer_id
+    ORDER BY 1;
+
++ The SQL query retrieves the `customer_id` and calculates the total amount spent (`total_amnt`) by each customer at the restaurant.
++ It combines data from the `sales` and `menu` tables based on matching `product_id`.
++ The results are grouped by `customer_id`.
++ The query then calculates the total sum of `price` for each group of sales records with the same `customer_id`.
++ Finally, the results are sorted in ascending order based on the `customer_id`.
+
+#### 2. How many days has each customer visited the restaurant?
+      SELECT
+		customer_id,
+            COUNT(DISTINCT order_date) AS days
+     FROM SALES
+     GROUP BY customer_id;
+
++ The SQL query selects the `customer_id` and counts the number of distinct order dates (`No_Days`) for each customer.
++ It retrieves data from the `sales table`.
++ The results are grouped by `customer_id`.
+ The `COUNT(DISTINCT order_date`) function calculates the number of unique order dates for each customer.
++ Finally, the query presents the total number of unique order dates as `No_Days` for each customer.
+
+#### 3. What was the first item from the menu purchased by each customer?
+
+     WITH orders AS (
+     SELECT 
+           customer_id,
+	       DENSE_RANK() OVER(PARTITION BY customer_id ORDER BY order_date) as rnk,
+	       m.product_name
+	FROM SALES s
+	LEFT JOIN menu m
+	ON m.product_id = s.product_id)
+    
+      SELECT 
+		customer_id,
+            product_name
+      FROM orders
+      WHERE rnk = 1;
+
++The SQL query uses a Common Table Expression (CTE) named `orders` to generate a temporary result set.
++ Within the CTE, it selects the `customer_id`, assigns a dense rank to each row based on the order date for each customer, and retrieves the corresponding `product_name` from the menu table.
++ The sales table is joined with the menu table on matching `product_id`.
++ The `DENSE_RANK()` function assigns a rank to each row within the partition of each `customer_id` based on the `order_date` in ascending order.
++ Each `customer_id` has its own partition and separate ranks based on the order dates of their purchases.
++ Next, the main query selects the `customer_id` and corresponding `product_name` from the CTE.
++ It filters the results and only includes rows where the rank `rnk` is equal to 1, which means the earliest purchase for each `customer_id`.
++ As a result, the query returns the first purchased product for each customer.
+
+#### 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+
+       SELECT 
+		m.product_name,
+            COUNT(s.product_id) AS count
+      FROM SALES s
+      LEFT JOIN menu m
+      ON m.product_id = s.product_id
+      GROUP BY 1
+      ORDER BY count DESC
+      LIMIT 1;
+
++ The SQL query selects the `product_name` from the menu table and counts the number of times each product was ordered (`count`).
++ It retrieves data from the `Sales table` and joins it with the menu table based on matching `product_id`.
++ The results are grouped by `product_name`.
++ The COUNT(`S.product_id`) function calculates the number of occurrences of each `product_id` in the Sales table.
++ The query then presents the `product_name` and its corresponding count as `count` for each product.
++ Next, the results are sorted in descending order based on the `most_ordered` column, so the most ordered product appears first.
++ The `LIMIT 1` clause is used to restrict the result to only one row, effectively showing the most ordered product.
+
+#### 5. Which item was the most popular for each customer?
+
+     WITH orders AS (
+		SELECT
+				s.customer_id,
+				m.product_name,
+				COUNT(m.product_id) as counts,
+				DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY COUNT(m.product_id) DESC) AS rnk
+		FROM SALES S
+		LEFT JOIN menu m
+		ON m.product_id = s.product_id
+		GROUP BY customer_id, 2)
+     SELECT 
+		customer_id,
+		product_name,
+        counts
+     FROM orders
+     WHERE rnk =  1;
+
++The SQL query uses a Common Table Expression (CTE) named CTE to generate a temporary result set.
++ Within the CTE, it selects the `customer_id`, `product_name`, and counts the number of times each product was ordered (`counts`) for each customer.
++ It retrieves data from the sales table and joins it with the menu table based on matching `product_id`.
++ The results are grouped by `customer_id` and `product_name` to get the count of orders for each product of each customer.
++ The COUNT(`M.product_id`) function calculates the number of occurrences of each `product_id` in the menu table.
++ The `DENSE_RANK()` function assigns a rank to each row within the partition of each `customer_id` based on the order count of products in descending order.
++ Each `customer_id` has its own partition and separate ranks based on the number of product orders.
++ Next, the main query selects the `customer_id`, `product_name`, and `counts` from the CTE.
++ It filters the results and only includes rows where the rank `rnk` is equal to 1, which means the most ordered product for each `customer_id`.
++ As a result, the query returns the `customer's ID`, the most ordered product, and the number of times it was ordered by that customer.
+
+#### 6. Which item was purchased first by the customer after they became a member?
+
+    WITH orders AS (
+		SELECT 
+		    s.customer_id,
+		    menu.product_name,
+		    DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY order_date ASC) AS rnk
+		FROM SALES s
+		JOIN members m
+		ON m.customer_id = s.customer_id
+		LEFT JOIN menu
+		ON menu.product_id = s.product_id
+		WHERE s.order_date > m.join_date)
+    SELECT 
+		customer_id,
+            product_name
+    FROM orders
+    WHERE rnk = 1;
+
++ The SQL query retrieves distinct rows for each unique `customer_id` with their corresponding `product_name` from the sales and menu tables.
++ It filters the data based on the condition that the `order_date` in the sales table is greater than the `join_date` of the customer in the members table.
++ The sales table is aliased as s, the members table is aliased as `m`.
++ The query performs inner joins between `sales` and `members` tables on matching `customer_id` and between sales and menu tables on matching `product_id`.
++ Only rows that meet the join condition and the `order_date` > `join_date` condition are considered in the result set.
++ The query selects the `customer_id` and corresponding `product_name` for each customer who has placed an order after their `join_date`.
++ The results are sorted in ascending order based on the `customer_id`.
++ The `DISTINCT ON (s.customer_id`) clause ensures that only the first occurrence of each `customer_id` is included in the result set.
++ As a result, the query returns a unique list of `customer_id` along with the first `product_name` they ordered after joining as a member.
+
+#### 7. Which item was purchased just before the customer became a member?
+
+    WITH orders AS (
+		SELECT 
+			s.customer_id,
+			menu.product_name,
+			DENSE_RANK() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS rnk
+		FROM SALES s
+		JOIN members m
+		ON m.customer_id = s.customer_id
+		LEFT JOIN menu
+		ON menu.product_id = s.product_id
+		WHERE s.order_date < m.join_date)
+    SELECT 
+		customer_id,
+            product_name
+    FROM orders
+    WHERE rnk = 1;
+
++ The SQL query retrieves distinct rows for each `customer_id` with their corresponding `product_name` from the `sales` and `menu` tables.
++ It filters the data based on the condition that the `order_date` in the sales table is less than the `join_date` of the customer in the members table.
++ The `sales` table is aliased as `s`, the `members` table is aliased as `m`.
++ The query performs `left joins` between `sales` and `members` tables on matching `customer_id` and between sales and menu tables on matching `product_id`.
++ Only rows that meet the join condition and the `order_date` < `join_date` condition are considered in the result set.
++ The query selects the `customer_id` and corresponding `product_name` for each customer who has placed an order before their `join_date`.
++ The results are sorted in ascending order based on the `customer_id`.
++ As a result, the query returns a list of `customer_id` along with the last`product_name` they ordered before joining as a member.
+
+#### 8. What is the total items and amount spent for each member before they became a member?
+
+
+    SELECT 
+		s.customer_id,
+            COUNT(s.product_id) AS total_items,
+            SUM(m.price) AS total_amt
+    FROM SALES s
+    LEFT JOIN menu m
+    ON m.product_id = s.product_id
+    JOIN members 
+    ON members.customer_id = s.customer_id
+    WHERE members.join_date > s.order_date
+    GROUP BY 1;
+
++ The SQL query retrieves the customer_id along with the `total count` of items ordered (`total_item`) and the total amount spent (`total_amt`) by each customer.
++ It retrieves data from the sales table and joins it with the menu table based on matching `product_id`.
++ It also joins the sales table with the members table based on matching `customer_id`.
++ The results are filtered based on the condition that the `order_date` in the sales table is less than the `join_date` of the customer in the members table.
++ The `COUNT(S.product_id)` function calculates the number of occurrences of each `product_id` in the sales table, giving the total number of items ordered by each customer.
++ The `SUM(M.price)` function calculates the sum of the price from the menu table, providing the total amount spent by each customer.
++ Results are grouped by `customer_id` to get the totals for each customer.
++ The query then presents the customer_id, total_item, and total_amont for each customer who placed orders before joining as a member.
++ Finally, the results are sorted in ascending order based on the customer_id.
+
+#### 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+    SELECT 
+		s.customer_id,
+            SUM(CASE WHEN product_name = 'sushi' THEN price * 2
+			ELSE price END) *10 AS points
+    FROM SALES s
+    LEFT JOIN menu m
+    ON m.product_id = s.product_id
+    GROUP BY 1;
+
++ The SQL query retrieves the `customer_id` and calculates the total points (`points`) earned by each customer based on their purchases from the sales and menu tables.
++ It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
++ The query uses a `CASE` statement to differentiate between 'sushi' and other products.
++ If the product name is '`sushi`', the price is multiplied by 2 to give double points.
++ Otherwise, the regular price is considered.
++ The `SUM` function calculates the total points for each customer by adding up the points earned from their purchases.
++ The total points are then multiplied by 10 to give a scaled value.
++ Results are grouped by `customer_id` to get the total points for each customer.
++ The query then presents the `customer_id` and the scaled `total_points` for each customer based on their purchases.
+
+#### 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+    SELECT 
+		s.customer_id,
+            SUM(CASE WHEN s.order_date BETWEEN m.join_date and DATE_ADD(join_date, INTERVAL 6 DAY) OR product_name ='sushi'  
+				THEN price*2
+		    ELSE price END) * 10 AS points
+    FROM SALES s
+    JOIN members m
+    ON m.customer_id = s.customer_id
+    LEFT JOIN menu
+    ON menu.product_id = s.product_id
+    WHERE order_date <= '2021-01-31'
+    GROUP BY 1;
+
++ It selects `customer_id`, `join_date`, `join_date` + INTERVAL '6 days'.
++ Next, the query selects the `customer_id` and calculates the total points (`points`) earned by each customer based on their purchases from the sales and menu tables.
++ The query uses a `CASE` statement to differentiate between '`sushi`' purchases and other products.
++ If the product name is '`sushi`' or the order date falls within the range of join_date to valid_date, the points are calculated as 2 times 10 times the price of the product.
++ Otherwise, for other products, the points are calculated as 10 times the `price` of the product.
++ The `SUM` function calculates the total points for each customer by adding up the points earned from their purchases.
++ Results are grouped by `customer_id` to get the total points for each customer.
++ The query then presents the `customer_id` and the calculated points for each customer based on their purchases.
 
