@@ -1,4 +1,6 @@
 # Case Study #1 - Danny's Diner👨🏻‍🍳  
+![image](https://github.com/user-attachments/assets/07db2e77-f8a7-4817-8277-dc366dbd3034)
+
 ## Contents
 
 #### Introduction
@@ -29,6 +31,11 @@ The case study revolves around three key datasets:
 
 3. Members
 
+## Entity Relationship Diagram
+
+![image](https://github.com/user-attachments/assets/c839793a-d660-47a0-b6b7-9b5b7eab7585)
+
+
 ## Case Study Questions & Solutions
 
 #### 1. What is the total amount each customer spent at the restaurant?
@@ -42,6 +49,9 @@ The case study revolves around three key datasets:
     GROUP BY customer_id
     ORDER BY 1;
 
+![image](https://github.com/user-attachments/assets/81564864-bb49-42c1-aef1-ae3275aed803)
+
+
 + The SQL query retrieves the `customer_id` and calculates the total amount spent (`total_amnt`) by each customer at the restaurant.
 + It combines data from the `sales` and `menu` tables based on matching `product_id`.
 + The results are grouped by `customer_id`.
@@ -54,6 +64,9 @@ The case study revolves around three key datasets:
             COUNT(DISTINCT order_date) AS days
      FROM SALES
      GROUP BY customer_id;
+
+![image](https://github.com/user-attachments/assets/a2c5eeab-06dc-4ab9-9822-ca53db2b7bad)
+
 
 + The SQL query selects the `customer_id` and counts the number of distinct order dates (`No_Days`) for each customer.
 + It retrieves data from the `sales table`.
@@ -78,6 +91,9 @@ The case study revolves around three key datasets:
       FROM orders
       WHERE rnk = 1;
 
+![image](https://github.com/user-attachments/assets/bac4a7f8-40eb-425c-8f9e-3e1f94292b74)
+
+
 +The SQL query uses a Common Table Expression (CTE) named `orders` to generate a temporary result set.
 + Within the CTE, it selects the `customer_id`, assigns a dense rank to each row based on the order date for each customer, and retrieves the corresponding `product_name` from the menu table.
 + The sales table is joined with the menu table on matching `product_id`.
@@ -99,6 +115,9 @@ The case study revolves around three key datasets:
       GROUP BY 1
       ORDER BY count DESC
       LIMIT 1;
+
+![image](https://github.com/user-attachments/assets/4bd78be1-1409-4b6a-b9c4-2fda6bda344c)
+
 
 + The SQL query selects the `product_name` from the menu table and counts the number of times each product was ordered (`count`).
 + It retrieves data from the `Sales table` and joins it with the menu table based on matching `product_id`.
@@ -126,6 +145,9 @@ The case study revolves around three key datasets:
         counts
      FROM orders
      WHERE rnk =  1;
+
+
+![image](https://github.com/user-attachments/assets/7cf3dc7e-d527-40aa-b1fb-cd2d07569e24)
 
 +The SQL query uses a Common Table Expression (CTE) named CTE to generate a temporary result set.
 + Within the CTE, it selects the `customer_id`, `product_name`, and counts the number of times each product was ordered (`counts`) for each customer.
@@ -157,6 +179,8 @@ The case study revolves around three key datasets:
     FROM orders
     WHERE rnk = 1;
 
+![image](https://github.com/user-attachments/assets/74e13164-3622-4807-a34b-a0c1b8ad7f4f)
+
 + The SQL query retrieves distinct rows for each unique `customer_id` with their corresponding `product_name` from the sales and menu tables.
 + It filters the data based on the condition that the `order_date` in the sales table is greater than the `join_date` of the customer in the members table.
 + The sales table is aliased as s, the members table is aliased as `m`.
@@ -186,6 +210,8 @@ The case study revolves around three key datasets:
     FROM orders
     WHERE rnk = 1;
 
+![image](https://github.com/user-attachments/assets/27b494eb-f05c-4616-b11d-3deb3f3e15f9)
+
 + The SQL query retrieves distinct rows for each `customer_id` with their corresponding `product_name` from the `sales` and `menu` tables.
 + It filters the data based on the condition that the `order_date` in the sales table is less than the `join_date` of the customer in the members table.
 + The `sales` table is aliased as `s`, the `members` table is aliased as `m`.
@@ -210,6 +236,8 @@ The case study revolves around three key datasets:
     WHERE members.join_date > s.order_date
     GROUP BY 1;
 
+![image](https://github.com/user-attachments/assets/fa469d8f-fe46-4357-945b-b1a92af1b552)
+
 + The SQL query retrieves the customer_id along with the `total count` of items ordered (`total_item`) and the total amount spent (`total_amt`) by each customer.
 + It retrieves data from the sales table and joins it with the menu table based on matching `product_id`.
 + It also joins the sales table with the members table based on matching `customer_id`.
@@ -230,6 +258,9 @@ The case study revolves around three key datasets:
     LEFT JOIN menu m
     ON m.product_id = s.product_id
     GROUP BY 1;
+
+
+![image](https://github.com/user-attachments/assets/6ee651bc-1b96-4158-9604-6e15147a42c7)
 
 + The SQL query retrieves the `customer_id` and calculates the total points (`points`) earned by each customer based on their purchases from the sales and menu tables.
 + It retrieves data from the `sales` table and joins it with the `menu` table based on matching `product_id`.
@@ -255,6 +286,9 @@ The case study revolves around three key datasets:
     ON menu.product_id = s.product_id
     WHERE order_date <= '2021-01-31'
     GROUP BY 1;
+
+
+![image](https://github.com/user-attachments/assets/08ce6024-b7b1-4515-8eb6-0ff6139a643b)
 
 + It selects `customer_id`, `join_date`, `join_date` + INTERVAL '6 days'.
 + Next, the query selects the `customer_id` and calculates the total points (`points`) earned by each customer based on their purchases from the sales and menu tables.
