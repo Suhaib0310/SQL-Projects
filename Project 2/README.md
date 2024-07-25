@@ -1,1 +1,256 @@
+# Case Study #2 Pizza Runner🍕  
+## Contents
 
+1. Introduction
+
+2. Entity Relationship Diagram
+3. Data Cleaning & Data Transformation
+4. Case Study Questions & Solutions
+   + A. Pizza Metrics
+    + B. Runner And Customer Experience
+   + C. Ingredient Optimisation
+5. Key Insights
+
+## Introduction
+##### Welcome to the Pizza Runner Case Study! Follow Danny's journey as he combines the irresistible allure of "80s Retro Styling and Pizza Is The Future" to launch Pizza Runner, an innovative venture in the pizza delivery industry. With his background in data science, Danny understands the significance of data collection for business growth. Now, he seeks assistance in cleaning and analyzing the data to optimize Pizza Runner's operations and guide his runners more efficiently. Join us as we explore how data-driven decisions propel Pizza Runner towards success and elevate the pizza delivery experience to new heights.
+
+## Entity Relationship Diagram
+
+## Data Cleaning & Data Transformation
+
++ The customer_orders table consists of individual pizza orders, with each row representing a unique pizza.
++ Key columns in the table are pizza_id, exclusions, and extras.
++ Before utilizing the data for queries, the exclusions and extras columns require a data cleaning process to ensure accuracy and consistency.
++ Data cleaning involves handling missing or null values in the exclusions and extras columns.
++ The ingredient_id values in the exclusions and extras columns need to be standardized for uniformity.
++ Inconsistencies and duplicates in the exclusions and extras data should be resolved to eliminate ambiguities.
++ By performing thorough data cleaning, the customer_orders table will be optimized for effective analysis.
++ The cleaned data will provide valuable insights into customer preferences, enabling better decision-making for Pizza Runner's operations.
++ With accurate data, Pizza Runner can efficiently meet customer demands and deliver an enhanced pizza ordering experience.
+
+      CREATE TEMPORARY TABLE customer_orders_temp 
+      SELECT 
+		order_id,
+        customer_id,
+        pizza_id,
+        CASE WHEN exclusions IS NULL OR exclusions LIKE 'null' or exclusions= '' THEN null
+			ELSE exclusions END AS exclusions,
+		CASE WHEN extras IS NULL OR extras LIKE 'null' OR extras = '' THEN null
+			ELSE extras END AS extras,
+		order_time
+      FROM customer_orders;
+
++ customer_orders table After AS customer_order_tempp
+
++ runner_orders table Before
+
+
+The data in the orders table of Pizza Runner contains valuable information regarding the assignment of orders to runners, including pickup times, distances, and durations. However, it is crucial to note that the table may have some known data issues that require careful handling during data cleaning.
+
+Here are the key points to consider when cleaning the data in the orders table:
+
++ Verify Data Types: Before proceeding with data cleaning, it is essential to check the data types for each column in the schema SQL. Ensuring accurate data types will prevent potential data type mismatches and errors in subsequent queries.
++ Handle Incomplete Orders: Some orders may not be fully completed and can be canceled by either the restaurant or the customer. It is necessary to identify and properly handle these incomplete orders during the data cleaning process.
++ Address Null Values: The table may contain null values in certain columns, such as pickup_time, distance, and duration. Properly handling these null values is crucial to avoid inaccuracies in the analysis.
++ Validate Timestamps: The pickup_time column represents the timestamp when the runner arrives at Pizza Runner headquarters to pick up the pizzas. Validating and ensuring the consistency of these timestamps will be essential to maintain data integrity.
++ Clean Distance and Duration: The distance and duration fields provide information about the runner's travel to deliver the order. Cleaning these fields involves checking for any outliers or inconsistencies that may affect analysis results.
++ Address Known Data Issues: As there are known data issues in the table, special attention must be given to resolving these issues during the data cleaning process. Identifying and rectifying data discrepancies will enhance the accuracy and reliability of the dataset.
+
+       CREATE TEMPORARY TABLE runner_orders_temp
+       SELECT 
+		order_id,
+        runner_id,
+        CASE 
+			WHEN pickup_time IS NULL OR pickup_time LIKE 'null' THEN null
+			ELSE pickup_time END AS pickup_time,
+		CASE 
+			WHEN distance IS NULL OR distance LIKE 'null' THEN null
+			 WHEN distance LIKE '%KM' THEN TRIM('km' FROM distance)
+             ELSE distance END AS distance,
+		CASE 
+			WHEN duration IS NULL OR duration LIKE 'null' THEN null
+			WHEN duration LIKE '%mins' THEN TRIM('mins' FROM duration)
+            WHEN duration LIKE '%minutes' THEN TRIM('minutes' FROM duration)
+            WHEN duration LIKE '%minute' THEN TRIM('minute' FROM duration)
+            ELSE duration END AS duration,
+		CASE 
+			WHEN cancellation IS NULL OR cancellation LIKE 'null' or cancellation = '' THEN null
+			ELSE cancellation END AS cancellation
+      FROM runner_orders;
+
++ runner_orders table After AS runner_orders_temp
+
+
+## Case Study Questions & Solutions
+
+A. Pizza Metrics🍕🍕
+
+#### 1. How many pizzas were ordered?
+
+    SELECT COUNT(order_id)AS total_pizzas
+    FROM customer_orders_temp;
+
++ The SQL query selects the number of pizza orders (`pizza_orders`) from the `customer_orders_temp table.
++ The `COUNT(order_id)` function calculates the total number of order IDs in the `customer_orders_temp` table, effectively giving the count of pizza orders.
++ As a result, the query presents the total count of pizza orders as `pizza_orders`.
+
+#### 2. How many unique customer orders were made?
+
+	SELECT COUNT(DISTINCT order_id) AS unique_orders
+    FROM customer_orders_temp;
+
++ The SQL query selects the number of unique orders (`unique_orders`) from the `customer_orders_tem` table.
++ The `COUNT(DISTINCT order_id)` function calculates the total count of distinct order IDs in the `customer_orders_temp` table, effectively giving the count of unique orders.
++ As a result, the query presents the total count of unique orders as `unique_orders`.
+
+#### 3. How many successful orders were delivered by each runner?
+
+     SELECT 
+		runner_id,
+        COUNT(order_id) AS order_count
+    FROM runner_orders_temp 
+    WHERE cancellation IS NULL
+    GROUP BY 1;
+
++ The SQL query selects the `runner_id` and counts the number of orders delivered (ordeR_count) for each runner from the `runner_orders_temp` table.
++ It retrieves data from the `runner_orders_temp` table.
++ The query filters the data using the WHERE clause, selecting only the rows where the cancellation column is empty (i.e., no cancellation).
++ Results are grouped by `runner_id`.
++ The `COUNT(order_id)` function calculates the number of occurrences of each `order_id` in the `runner_orders_temp` table, giving the count of orders delivered by each runner.
++ As a result, the query presents the total count of orders delivered as `orders_delivered` for each runner from the `runner_orders_temp` table.
+
+#### 4. How many of each type of pizza was delivered?
+
+
+       SELECT 
+		pizza_name,
+        COUNT(c.pizza_id) AS pizza_count
+    customer_orders_temp c
+    LEFT JOIN pizza_names p 
+    ON p.pizza_id = c.pizza_id
+    LEFT JOIN runner_orders_temp r
+    ON r.order_id = c.order_id
+    WHERE r.cancellation IS NULL
+    GROUP BY 1;
+
++ The SQL query retrieves the `pizza_name` and counts the number of delivered orders for each pizza (`pizza_count`) from the `customer_orders_temp` table.
++ It retrieves data from the `customer_orders_temp` table and joins it with the `runner_orders_temp` table and the `pizza_names` table.
++ The query performs joins between the tables based on matching `order_id`, `pizza_id`, and `pizza_name`.
++ It also filters the data using the `WHERE` clause, selecting only the rows where the cancellation column is empty (i.e., no cancellation).
++ Results are grouped by `pizza_name` to get the count of delivered orders for each pizza.
++ The COUNT(C.pizza_id) function calculates the number of occurrences of each pizza_id in the customer_orders_tempp table, giving the count of delivered orders for each pizza.
++ As a result, the query presents the total count of delivered orders as delivered_order_count for each pizza from the customer_orders_tempp, runner_orders_temp, and pizza_names tables.
+
+#### 5. How many Vegetarian and Meatlovers were ordered by each customer?
+
+
+    SELECT 
+		customer_id,
+            SUM(CASE WHEN pizza_name = 'Meatlovers' THEN 1 ELSE 0 END) AS Meatlovers,
+            SUM(CASE WHEN pizza_name = 'Vegetarian' THEN 1 ELSE 0 END) AS Vegetarian
+    FROM customer_orders_temp c
+    LEFT JOIN pizza_names p
+    ON p.pizza_id = c.pizza_id
+    GROUP BY 1;
+
++ The SQL query retrieves the `customer_id`, `pizza_name`, and counts the number of ordered pizzas for each customer and pizza combination from the `customer_orders_temp` table.
++ It retrieves data from the `customer_orders_temp` table and joins it with the `pizza_names` table based on matching `pizza_id`.
++ Results are grouped by both `customer_id` and `pizza_name` to calculate the count of ordered pizzas for each customer and pizza combination.
++ As a result, the query presents the total count of ordered pizzas for each customer and pizza combination from the `customer_orders_temp` and `pizza_names` tables.
+
+
+#### 6. What was the maximum number of pizzas delivered in a single order?
+
+    SELECT 
+        COUNT(c.order_id) pizza_count
+    FROM customer_orders_temp c
+    LEFT JOIN runner_orders_temp r
+    ON r.order_id = c.order_id
+    WHERE cancellation IS NULL
+    GROUP BY order_time
+    ORDER BY pizza_count DESC
+    LIMIT 1;
+
++ It retrieves the `order_id` and calculates the number of pizzas delivered for each order (`orders_delivered`) from the `customer_orders_temp` table.
++ It performs an left join between the `customer_orders_tempp` table and the `runner_orders_temp` table on matching `order_id` to get the pizza delivery information.
++ The query filters the data using the `WHERE` clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
++ Results are grouped by `order_time` to calculate the count of pizzas delivered for each order.
++ The `COUNT(C.order_id`) function calculates the number of occurrences of each `order_id` in the `customer_orders_temp` table, giving the count of pizzas delivered for each order.
++ Next, the query selects the maximum value of `orders_delivered`.
++ As a result, the query presents the maximum count of pizzas delivered as `max_deliver_pizza` among all the orders from the `customer_orders_temp` and `runner_orders_temp` tables, excluding any orders with cancellations.
+
+#### 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+
+    SELECT 
+		customer_id,
+		SUM(CASE WHEN exclusions IS NOT NULL OR extras IS NOT NULL THEN 1 ELSE 0 END) AS 'changes',
+        SUM(CASE WHEN exclusions IS NULL AND extras IS  NULL THEN 1 ELSE 0 END) AS 'no_changes'
+    FROM customer_orders_temp c
+    LEFT JOIN runner_orders_temp r
+    ON r.order_id = c.order_id
+    WHERE cancellation IS NULL
+    GROUP BY 1;
+
+
++ It retrieves the `customer_id` and calculates two aggregates:
+`changes` - the count of customers who have at least one change in their orders.
+no_changes - the count of customers who have no changes in their orders (neither exclusions nor extras).
++ It performs an inner join between the `customer_orders_temp` table and the `runner_orders_temp` table on matching `order_id` to get the order information.
++ The query filters the data using the WHERE clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
++ The CASE statement is used to conditionally evaluate whether there are exclusions or extras in the orders for each customer.
++ The SUM function is then used to calculate the totals of `changes` and `no_changes` for each customer.
++ Next, the main query selects the sum of `changes` and `no_changes` from the CTE CTE.
++ The SUM function returns the sum of these values, giving the total count of customers who have at least one change in their orders and the total count of customers who have no changes in their orders.
++ As a result, the query presents the total count of customers with at least one change (`changes`) and the total count of customers with no changes (`no_changes`) among all the orders from the `customer_orders_temp` and `runner_orders_temp` tables, excluding any orders with cancellations.
+
+#### 8. How many pizzas were delivered that had both exclusions and extras?
+
+
+ 
+	SELECT 
+		count(c.pizza_id) AS pizza_count
+    FROM customer_orders_temp c
+    LEFT JOIN runner_orders_temp r
+    ON r.order_id = c.order_id
+    WHERE  cancellation IS NULL
+	  AND exclusions IS NOT NULL 
+	  AND extras IS NOT NULL;
+
++ The SQL query calculates the count of pizzas with both `exclusions` and `extras` from the `customer_orders_temp` table.
++ It performs an left join between the `customer_orders_temp` table and the `runner_orders_temp` table on matching `order_id` to get the order information.
++ The query filters the data using the `WHERE` clause, selecting only the rows where the cancellation column (cancellation) in the `runner_orders_temp` table is empty (i.e., no cancellation).
++ The `CASE` statement is used to conditionally evaluate whether there are both exclusions and extras in the orders for each pizza.
++ The SUM function then calculates the total count of pizzas with both exclusions and extras by summing up the ones that meet the specified condition.
++ As a result, the query presents the total count of pizzas with both exclusions and extras among all the orders from the `customer_orders_temp` and `runner_orders_temp` tables, excluding any orders with cancellations.
+
+#### 9. What was the total volume of pizzas ordered for each hour of the day?
+
+    SELECT 
+		HOUR(order_time) AS hr,
+        COUNT(pizza_id) AS pizza_count
+    FROM customer_orders_temp
+    GROUP BY 1
+    ORDER BY hr ASC;
+
++ The SQL query selects the hours portion of the `order_time` and the count of orders (pizza_count) from the `customer_orders_temp` table.
++ It uses the `HOUR` function with HOURS to extract the hour portion from the `order_time`.
++ Results are grouped by the extracted hour value to calculate the count of orders for each hour.
++ The `COUNT(pizza_id)` function calculates the number of occurrences of each `order_id` in the `customer_orders_temp` table, giving the count of orders for each hour.
++ The query presents the extracted hours as hours and the corresponding count of orders as pizza ordered.
++ Finally, the results are sorted in ascending order based on the extracted hours.
+
+#### 10. What was the volume of orders for each day of the week?
+
+
+    SELECT
+		dayname(order_time) AS days,
+        COUNT(pizza_id) AS pizza_count
+    FROM customer_orders_temp
+    GROUP BY 1;
+
++ The SQL query selects the day of the week from the `order_time` and the count of orders (`pizza_count`) from the `customer_orders_tempp` table.
++ It uses the `DAY_NAME`function to convert the `order_time` into a textual representation of the day of the week (DAY).
++ Results are grouped by the textual representation of the day of the week to calculate the count of orders for each day.
++ The `COUNT(pizza_id) `function calculates the number of occurrences of each `order_id` in the `customer_orders_temp` table, giving the count of orders for each day of the week.
++ The query presents the textual representation of the day of the week as day and the corresponding count of orders as `ordered_pizza`.
++ Finally, the results are sorted based on the textual representation of the day of the week.
