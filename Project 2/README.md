@@ -454,12 +454,12 @@ no_changes - the count of customers who have no changes in their orders (neither
 
 
     CREATE TABLE numbers (
-    num INT PRIMARY KEY
-);
+        num INT PRIMARY KEY
+    );
 
-    INSERT INTO numbers (num)
-    VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
-       (11), (12), (13), (14), (15), (16), (17), (18), (19), (20);
+        INSERT INTO numbers (num)
+        VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
+            (11), (12), (13), (14), (15), (16), (17), (18), (19), (20);
 
 #### 1. What are the standard ingredients for each pizza?
 
