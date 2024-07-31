@@ -453,9 +453,9 @@ no_changes - the count of customers who have no changes in their orders (neither
 + Created a table called numbers, it will be used to split columns values into individual rows
 
 
-    CREATE TABLE numbers (
-        num INT PRIMARY KEY
-    );
+        CREATE TABLE numbers (
+             num INT PRIMARY KEY
+        );
 
         INSERT INTO numbers (num)
         VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10),
