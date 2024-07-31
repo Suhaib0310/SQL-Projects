@@ -304,7 +304,7 @@ no_changes - the count of customers who have no changes in their orders (neither
 #### 1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)
 
 
-    ]SELECT WEEK(registration_date,1) AS weeks,
+     SELECT WEEK(registration_date,1) AS weeks,
        COUNT(runner_id) AS signed_runner_week
     FROM runners
     GROUP BY weeks
